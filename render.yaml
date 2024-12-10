@@ -3,5 +3,3 @@ services:
     name: mye-liquid-api
     runtime: docker
     plan: free
-    buildCommand: docker build -t mye-liquid-api .
-    startCommand: docker run -p 8080:8080 mye-liquid-api
