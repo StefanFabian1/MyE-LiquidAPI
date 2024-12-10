@@ -4,11 +4,19 @@ FROM eclipse-temurin:17-jdk
 # Nastavenie pracovného adresára
 WORKDIR /app
 
-# Skopíruj súbory projektu do kontajnera
-COPY . .
+# Skopíruj iba potrebné súbory pre Gradle build
+COPY build.gradle settings.gradle gradlew* ./
+COPY src ./src
+COPY .mvn .mvn
+
+# Uisti sa, že `gradlew` má správne oprávnenia
+RUN chmod +x ./gradlew
 
 # Spusti Gradle build a vytvor JAR
-RUN ./gradlew bootJar
+RUN ./gradlew bootJar --no-daemon
+
+# Expose port pre Render
+EXPOSE 8080
 
 # Nastav príkaz na spustenie aplikácie
 CMD ["java", "-jar", "build/libs/mye-liquid-api-0.0.1-SNAPSHOT.jar"]
