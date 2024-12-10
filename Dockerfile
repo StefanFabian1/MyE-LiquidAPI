@@ -19,4 +19,4 @@ RUN ./gradlew bootJar --no-daemon
 EXPOSE 8080
 
 # Nastav príkaz na spustenie aplikácie
-CMD ["java", "-jar", "build/libs/mye-liquid-api-0.0.1-SNAPSHOT.jar"]
+CMD ["sh", "-c", "java -jar build/libs/mye-liquid-api-0.0.1-SNAPSHOT.jar --server.port=${PORT:-8080}"]
