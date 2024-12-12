@@ -40,7 +40,7 @@ tasks.named('test') {
 tasks.withType(Jar).configureEach {
     manifest {
         attributes(
-                'Main-Class': 'sk.sfabian.myeliquidapi.MyELiquidApiApplication'
+                'Start-Class': 'sk.sfabian.myeliquidapi.MyELiquidApiApplication'
         )
     }
 }
