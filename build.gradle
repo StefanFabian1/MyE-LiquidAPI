@@ -36,3 +36,15 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.withType(Jar).configureEach {
+    manifest {
+        attributes(
+                'Main-Class': 'sk.sfabian.myeliquidapi.MyELiquidApiApplication'
+        )
+    }
+}
+
+bootJar {
+    archiveFileName = 'myeliquidapi.jar'
+}
