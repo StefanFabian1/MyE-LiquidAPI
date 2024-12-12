@@ -36,11 +36,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-tasks.named('bootJar') {
-    enabled = true // Povolenie generovania spustiteľného JAR
-}
-
-tasks.named('jar') {
-    enabled = false // Deaktivácia obyčajného JAR
-}

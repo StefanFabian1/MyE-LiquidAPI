@@ -1,5 +1,0 @@
-services:
-  - type: web
-    name: mye-liquid-api
-    runtime: docker
-    plan: free
