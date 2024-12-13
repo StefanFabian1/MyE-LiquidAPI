@@ -26,7 +26,7 @@ public class IngredientController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteIngredient(@PathVariable Integer id) {
+    public void deleteIngredient(@PathVariable String id) {
         ingredientService.deleteIngredient(id);
     }
 }

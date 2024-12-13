@@ -1,5 +1,6 @@
 package sk.sfabian.myeliquidapi.service;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import sk.sfabian.myeliquidapi.model.Ingredient;
 import sk.sfabian.myeliquidapi.repository.IngredientRepository;
@@ -22,7 +23,8 @@ public class IngredientService {
         return ingredientRepository.save(ingredient);
     }
 
-    public void deleteIngredient(Integer id) {
-        ingredientRepository.deleteById(id);
+    public void deleteIngredient(String id) {
+
+        ingredientRepository.deleteById(new ObjectId(id));
     }
 }
