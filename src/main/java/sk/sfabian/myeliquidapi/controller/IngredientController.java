@@ -23,7 +23,7 @@ public class IngredientController {
 
     @PostMapping
     public IngredientDto addIngredient(@RequestBody IngredientDto ingredient) {
-        return ingredientService.addIngredient(new IngredientDto());
+        return ingredientService.addIngredient(ingredient);
     }
 
     @DeleteMapping("/{id}")

@@ -9,9 +9,12 @@ import java.util.concurrent.Executors;
 
 @Configuration
 public class AppConfig {
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+
     @Bean
     public ExecutorService executorService() {
-        return Executors.newCachedThreadPool();
+        return executorService;
     }
 
     @PreDestroy
