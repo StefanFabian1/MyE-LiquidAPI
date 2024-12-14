@@ -3,9 +3,12 @@ package sk.sfabian.myeliquidapi.service;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import sk.sfabian.myeliquidapi.model.Ingredient;
+import sk.sfabian.myeliquidapi.model.dto.IngredientDto;
+import sk.sfabian.myeliquidapi.model.dto.IngredientMapper;
 import sk.sfabian.myeliquidapi.repository.IngredientRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class IngredientService {
@@ -15,12 +18,16 @@ public class IngredientService {
         this.ingredientRepository = ingredientRepository;
     }
 
-    public List<Ingredient> fetchAllIngredients() {
-        return ingredientRepository.findAll();
+    public List<IngredientDto> fetchAllIngredients() {
+        return ingredientRepository.findAll().stream()
+                .map(IngredientMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public Ingredient addIngredient(Ingredient ingredient) {
-        return ingredientRepository.save(ingredient);
+    public IngredientDto addIngredient(IngredientDto ingredientDto) {
+        Ingredient ingredient = IngredientMapper.fromDto(ingredientDto);
+        Ingredient savedIngredient = ingredientRepository.save(ingredient);
+        return IngredientMapper.toDto(savedIngredient);
     }
 
     public void deleteIngredient(String id) {

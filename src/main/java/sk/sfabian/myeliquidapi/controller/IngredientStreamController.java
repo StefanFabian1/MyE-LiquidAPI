@@ -2,6 +2,7 @@ package sk.sfabian.myeliquidapi.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import sk.sfabian.myeliquidapi.service.IngredientChangeStreamService;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 @RestController
+@RequestMapping(value = "/api/ingredients")
 public class IngredientStreamController {
     private final IngredientChangeStreamService changeStreamService;
     private final ExecutorService executorService;
@@ -19,7 +21,7 @@ public class IngredientStreamController {
         this.executorService = executorService;
     }
 
-    @GetMapping(value = "/api/ingredients/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamChanges() {
         SseEmitter emitter = new SseEmitter();
         executorService.submit(() -> {

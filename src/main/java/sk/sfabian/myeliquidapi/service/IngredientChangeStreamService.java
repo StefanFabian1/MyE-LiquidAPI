@@ -1,18 +1,20 @@
 package sk.sfabian.myeliquidapi.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.changestream.ChangeStreamDocument;
 import jakarta.annotation.PostConstruct;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
-import sk.sfabian.myeliquidapi.controller.IngredientStreamController;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+
+import static com.mongodb.client.model.Filters.eq;
 
 @Service
 public class IngredientChangeStreamService {
@@ -46,14 +48,32 @@ public class IngredientChangeStreamService {
     }
 
     private void handleEvent(ChangeStreamDocument<Document> event) {
-        String message = switch (event.getOperationType()) {
-            case INSERT -> "Added ingredient: " + event.getFullDocument().toJson();
-            case UPDATE -> "Updated fields: " + event.getUpdateDescription().getUpdatedFields();
-            case DELETE -> "Deleted ingredient with ID: " + event.getDocumentKey().getObjectId("_id");
-            default -> "Unhandled event: " + event.getOperationType();
-        };
-        if (eventConsumer != null) {
-            eventConsumer.accept(message);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String message = switch (event.getOperationType()) {
+                case INSERT -> {
+                    Document fullDocument = event.getFullDocument();
+                    yield "A" + objectMapper.writeValueAsString(fullDocument); // Prefix "A" for ADD
+                }
+                case UPDATE -> {
+                    ObjectId id = event.getDocumentKey().getObjectId("_id").getValue();
+                    Document fullDocument = mongoTemplate.getCollection("ingredients")
+                            .find(eq("_id", id))
+                            .first();
+                    yield "U" + objectMapper.writeValueAsString(fullDocument); // Prefix "U" for UPDATE
+                }
+                case DELETE -> {
+                    String id = event.getDocumentKey().getObjectId("_id").getValue().toHexString();
+                    yield "D{\"_id\":\"" + id + "\"}"; // Prefix "D" for DELETE
+                }
+                default -> "Unhandled event: " + event.getOperationType();
+            };
+
+            if (eventConsumer != null) {
+                eventConsumer.accept(message); // Send the message to the consumer
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -16,4 +16,5 @@ public class Ingredient {
     private ObjectId id;
     private String name;
     private String quantity;
+
 }

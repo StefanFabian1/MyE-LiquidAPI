@@ -2,6 +2,7 @@ package sk.sfabian.myeliquidapi.controller;
 
 import org.springframework.web.bind.annotation.*;
 import sk.sfabian.myeliquidapi.model.Ingredient;
+import sk.sfabian.myeliquidapi.model.dto.IngredientDto;
 import sk.sfabian.myeliquidapi.service.IngredientService;
 
 import java.util.List;
@@ -16,13 +17,13 @@ public class IngredientController {
     }
 
     @GetMapping
-    public List<Ingredient> fetchIngredients() {
+    public List<IngredientDto> fetchIngredients() {
         return ingredientService.fetchAllIngredients();
     }
 
     @PostMapping
-    public Ingredient addIngredient(@RequestBody Ingredient ingredient) {
-        return ingredientService.addIngredient(ingredient);
+    public IngredientDto addIngredient(@RequestBody IngredientDto ingredient) {
+        return ingredientService.addIngredient(new IngredientDto());
     }
 
     @DeleteMapping("/{id}")
