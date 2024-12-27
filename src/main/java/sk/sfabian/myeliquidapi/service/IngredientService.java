@@ -18,11 +18,15 @@ public class IngredientService {
         this.ingredientRepository = ingredientRepository;
     }
 
-    public List<IngredientDto> fetchAllIngredients() {
-        return ingredientRepository.findAll().stream()
+    /* TODO --- Toto by teoreticky malo vratit ingrediencie aj s movementmi, ale toto FE zatial nepotrebuje, nedrzi movements v cahce
+    TODO query je jednoduche, ale potrebovali by sme result zabalit do noveho DTO a tento DTO vytvorit aj na FE
+    public List<IngredientDto> getAllIngredients() {
+        List<Ingredient> ingredients = ingredientRepository.findAll();
+        return ingredients.stream()
                 .map(IngredientMapper::toDto)
                 .collect(Collectors.toList());
     }
+    */
 
     public IngredientDto addIngredient(IngredientDto ingredientDto) {
         Ingredient ingredient = IngredientMapper.fromDto(ingredientDto);
@@ -33,5 +37,12 @@ public class IngredientService {
     public void deleteIngredient(String id) {
 
         ingredientRepository.deleteById(new ObjectId(id));
+    }
+
+    public List<IngredientDto> getIngredientsWithoutMovements() {
+        List<Ingredient> ingredients = ingredientRepository.findAllWithoutMovements();
+        return ingredients.stream()
+                .map(IngredientMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

@@ -2,7 +2,6 @@ package sk.sfabian.myeliquidapi.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.changestream.ChangeStreamDocument;
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
@@ -10,27 +9,29 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.stereotype.Service;
 import sk.sfabian.myeliquidapi.model.Ingredient;
 import sk.sfabian.myeliquidapi.model.dto.IngredientDto;
 import sk.sfabian.myeliquidapi.model.dto.IngredientMapper;
 
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-
-import static com.mongodb.client.model.Filters.eq;
 
 @Service
 public class IngredientChangeStreamService {
     private final MongoTemplate mongoTemplate;
     private final ExecutorService executorService;
+    private final MappingMongoConverter mappingMongoConverter;
     @Setter
     private Consumer<String> eventConsumer;
 
     @Autowired
-    public IngredientChangeStreamService(MongoTemplate mongoTemplate, ExecutorService executorService) {
+    public IngredientChangeStreamService(MongoTemplate mongoTemplate, ExecutorService executorService, MappingMongoConverter mappingMongoConverter) {
         this.mongoTemplate = mongoTemplate;
         this.executorService = executorService;
+        this.mappingMongoConverter = mappingMongoConverter;
     }
 
     @PostConstruct
@@ -42,7 +43,7 @@ public class IngredientChangeStreamService {
                     handleEvent(event);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(Arrays.toString(e.getStackTrace()));
             }
         });
     }
@@ -54,8 +55,9 @@ public class IngredientChangeStreamService {
         try {
             String message = switch (event.getOperationType()) {
                 case INSERT -> {
-                    Document fullDocument = event.getFullDocument();
-                    yield "A" + objectMapper.writeValueAsString(fullDocument); // Prefix "A" for ADD
+                    assert event.getFullDocument() != null;
+                    Ingredient ingredient = mappingMongoConverter.read(Ingredient.class, event.getFullDocument());
+                    yield "A" + objectMapper.writeValueAsString(IngredientMapper.toDto(ingredient));
                 }
                 case UPDATE -> {
                     ObjectId id = event.getDocumentKey().getObjectId("_id").getValue();
@@ -79,7 +81,7 @@ public class IngredientChangeStreamService {
                 eventConsumer.accept(message); // Send the message to the consumer
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(Arrays.toString(e.getStackTrace()));
         }
     }
 }
