@@ -7,6 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +17,12 @@ public class Ingredient {
     @Id
     private ObjectId id;
     private String name;
-    private String quantity;
-
+    private Double quantity;
+    private String unit;
+    private Double unitPrice;
+    private String category;
+    private String subcategory;
+    private String description;
+    private String brand;
+    private List<Movement> movements;
 }
