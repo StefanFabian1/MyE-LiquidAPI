@@ -12,8 +12,9 @@ import org.springframework.data.annotation.Id;
 public class Movement {
     @Id
     private ObjectId id;
-    private Double quantity;
-    private Double totalPrice;
+    private String ingredientId;
+    private double quantity;
+    private double totalPrice;
     private String type;
-    private Long timestamp;
+    private long timestamp;
 }

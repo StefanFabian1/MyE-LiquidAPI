@@ -24,5 +24,4 @@ public class Ingredient {
     private String subcategory;
     private String description;
     private String brand;
-    private List<Movement> movements;
 }

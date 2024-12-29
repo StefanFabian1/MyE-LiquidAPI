@@ -10,7 +10,9 @@ import java.util.List;
 
 @Repository
 public interface IngredientRepository extends MongoRepository<Ingredient, ObjectId> {
+    @Query("{ '$text': { '$search': ?0 } }")
+    List<Ingredient> searchIngredients(String query);
 
-    @Query(value = "{}", fields = "{movements: 0}")
-    List<Ingredient> findAllWithoutMovements();
+    @Query("{ $or: [ { 'name': { $regex: ?0, $options: 'i' } }, { 'description': { $regex: ?0, $options: 'i' } } ] }")
+    List<Ingredient> searchIngredientsByRegex(String query);
 }

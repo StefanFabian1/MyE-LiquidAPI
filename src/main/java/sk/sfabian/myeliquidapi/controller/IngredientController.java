@@ -1,11 +1,11 @@
 package sk.sfabian.myeliquidapi.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sk.sfabian.myeliquidapi.model.IngredientMovementRequest;
+import sk.sfabian.myeliquidapi.model.Movement;
 import sk.sfabian.myeliquidapi.model.dto.IngredientDto;
 import sk.sfabian.myeliquidapi.service.IngredientService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,33 +22,47 @@ public class IngredientController {
         return ingredientService.getIngredientsWithoutMovements();
     }
 
-    @GetMapping("/ingredient/{name}")
-    public IngredientDto getIngredientByName(@PathVariable String name) {
-        // TODO
-        //return ingredientService.getIngredientByName(name);
-        return new IngredientDto();
+    @GetMapping("/ingredient/{id}")
+    public IngredientDto getIngredientById(@PathVariable String id) {
+        return ingredientService.getIngredient(id);
     }
 
-    @GetMapping("/ingredient/{id}/movements")
-    public IngredientDto getIngredientMovements(@PathVariable String id) {
-        // TODO
-        //return ingredientService.getIngredientByName(name);
-        return new IngredientDto();
+    @GetMapping("/search")
+    public List<IngredientDto> searchIngredients(@RequestParam String query) {
+        return ingredientService.searchIngredients(query);
     }
 
-    @PostMapping("/ingredients/movement")
-    public String addIngredientMovement(@RequestBody IngredientMovementRequest request) {
+    @GetMapping("/{id}/movements")
+    public ResponseEntity<List<Movement>> getMovements(@PathVariable String id) {
+        List<Movement> movements = ingredientService.getMovements(id);
+        return ResponseEntity.ok(movements);
+    }
 
-        IngredientDto ingredient = request.getIngredient();
+    @PostMapping("/{id}/movements")
+    public ResponseEntity<Void> addMovement(
+            @PathVariable String id,
+            @RequestParam double quantity,
+            @RequestParam double totalPrice,
+            @RequestParam String type) {
+        ingredientService.addMovement(id, quantity, totalPrice, type);
+        return ResponseEntity.ok().build();
+    }
 
-        ingredientService.addIngredient(ingredient); // Napr. pridanie ingrediencie
-        //movementService.addMovement(movement); // Napr. pridanie pohybu
-
-        return "Ingredient and movement added successfully";
+    @PostMapping("/ingredient")
+    public IngredientDto addIngredient(@RequestBody IngredientDto ingredientDto) {
+        return ingredientService.addIngredient(ingredientDto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteIngredient(@PathVariable String id) {
         ingredientService.deleteIngredient(id);
+    }
+
+    @PutMapping("/ingredient/{id}")
+    public ResponseEntity<Void> updateIngredient(
+            @PathVariable String id,
+            @RequestBody IngredientDto ingredientDto) {
+        ingredientService.updateIngredient(id, ingredientDto);
+        return ResponseEntity.ok().build();
     }
 }
