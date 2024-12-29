@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 public class IngredientChangeStreamService {
     private final MongoTemplate mongoTemplate;
     private final ExecutorService executorService;
-    private final MappingMongoConverter mappingMongoConverter;
     @Setter
     private Consumer<String> eventConsumer;
 
@@ -31,7 +30,6 @@ public class IngredientChangeStreamService {
     public IngredientChangeStreamService(MongoTemplate mongoTemplate, ExecutorService executorService, MappingMongoConverter mappingMongoConverter) {
         this.mongoTemplate = mongoTemplate;
         this.executorService = executorService;
-        this.mappingMongoConverter = mappingMongoConverter;
     }
 
     @PostConstruct
@@ -54,13 +52,9 @@ public class IngredientChangeStreamService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String message = switch (event.getOperationType()) {
-                case INSERT -> {
-                    assert event.getFullDocument() != null;
-                    Ingredient ingredient = mappingMongoConverter.read(Ingredient.class, event.getFullDocument());
-                    yield "A" + objectMapper.writeValueAsString(IngredientMapper.toDto(ingredient));
-                }
-                case UPDATE -> {
+                case INSERT, UPDATE, REPLACE -> {
                     ObjectId id = event.getDocumentKey().getObjectId("_id").getValue();
+
                     Ingredient ingredient = mongoTemplate.findById(id, Ingredient.class, "ingredients");
 
                     if (ingredient != null) {
